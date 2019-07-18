@@ -1,0 +1,5 @@
+pytorch
+numpy
+cv2
+distance
+nltk
