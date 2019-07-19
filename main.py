@@ -1,6 +1,8 @@
 from src import utils, encoder, decoder, model, trainer, cnn, embedding
 import params
 import glob, subprocess
+import sys
+import argparse
 
 def get_trainer(config):
 
@@ -58,7 +60,7 @@ def train(config):
     logger_config = {
         'owner' : 'Training.train',
         'log_dir' : config['log_dir'],
-        'timezone' : 'Iran',
+        'timezone' : 'UTC',
     }
     logger = utils.Logger(logger_config)
 
@@ -99,7 +101,7 @@ def evaluate(evalset, config, checkpoint=None):
     logger_config = {
         'owner' : 'Training.evaluate',
         'log_dir' : config['log_dir'],
-        'timezone' : 'Iran',
+        'timezone' : 'UTC',
     }
     logger = utils.Logger(logger_config)
 
@@ -152,3 +154,21 @@ def bleu_and_edit_distance(predictions, predicted_path, target_path):
     output = str(output)
     edit_message = output[output.find('Edit'):-3]
     return bleu_message, edit_message
+
+def process_args():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--train", const=True, nargs='?', help='start training')
+    parser.add_argument("--evaluate", const=True, nargs='?', help='start evaluation')
+    parser.add_argument("--evalset", type=str, help='test or validation')
+    parser.add_argument("--checkpoint", type=str, help='path to checkpoint')
+    args = parser.parse_args()
+    return args
+
+if __name__ == '__main__':
+    args = process_args()
+    config = params.config
+    if args.train:
+        train(config)
+    elif args.evaluate:
+        evaluate(args.evalset, params.config, args.checkpoint)
+    
